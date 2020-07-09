@@ -294,8 +294,6 @@ Qed.
 Definition holomorphic (f : C^o -> C^o) (c : C^o) :=
   cvg ((fun (h : C^o) => h^-1 *: ((f \o shift c) h - f c)) @ (locally' (0:C^o))).
 
-Lemma holomorphicP f c : holomorphic f c <-> (forall v, derivable f c v). (*TODO*)
-Admitted.
 
 Definition Real_line (c:C^o) := (Im c = 0).
 
@@ -305,24 +303,16 @@ Definition CauchyRiemanEq (f : C^o -> C^o) z :=
   lim ((fun h : C^o => h^-1 *: ((f \o shift z) (h * 'i) - f z)) @
                                        (within Real_line (locally' (0)))) .
 
-(*I needed filter_of_filterE to make things easier -
-looked a long time of it as I was looking for a [filter of lim]*
- instead of a [filter of filter]*)
-
-(*There should be a lemma analogous to [filter of lim] to ease the search  *)
-
 Definition Rderivable_fromcomplex (f : C^o -> C^o) (c v: C^o) :=
   cvg ((fun (h : C^o) => h^-1 * ((f \o shift c) (h *:v) - f c)) @
                          (within Real_line (locally' (0:C^o)))).
 
 
-(*We should find a way to make scalar mul and mul convertible on numFields *)
 Lemma holo_derivable (f : (C)^o -> (C)^o) c :
   holomorphic f c -> (forall v : C^o, Rderivable_fromcomplex f c v).
 Proof.
 move=> /cvg_ex. rewrite /type_of_filter /=.
 move => [l H]; rewrite /Rderivable_fromcomplex => v /=.
-  (* rewrite /type_of_filter /= in l H.  *)
 set quotR := (X in (X @ _)).
 pose locR0 := within Real_line (locally' 0).
 simpl in (type of quotR).
@@ -430,23 +420,25 @@ have ->: lim (quotR @ locR0) = 'i *: lim (quotC \o ( fun h => h *'i) @ locR0).
     by rewrite neq0Ci.
 by move => /funext <-; rewrite (limin_scaler properlocR0 'i HRcomp).
 rewrite scaleC_mul.
-suff: lim (quotC @ locR0) = lim (quotC \o  *%R^~ 'i%R @ locR0) by move => -> . 
-have -> : lim (quotC @ locR0) = l. 
+suff: lim (quotC @ locR0) = lim (quotC \o  *%R^~ 'i%R @ locR0) by move => -> .
+have -> : lim (quotC @ locR0) = l.
 apply/cvg_lim; first by apply: norm_hausdorff.
   by apply:fmap_proper_filter; exact: properlocR0.
   by apply: cvg_within_filter.
-have -> :  lim (quotC \o  *%R^~ 'i%R @ locR0) = l.      
+have -> :  lim (quotC \o  *%R^~ 'i%R @ locR0) = l.
   apply/cvg_lim; first by apply: norm_hausdorff.
   by apply:fmap_proper_filter; exact: properlocR0.
   by [].
-by []. 
+by [].
 Qed.
- 
+
 End Holomorphe_der.
 
 Module CR_holo.
 Variable (R: rcfType).
 Notation C := R[i].
+
+(*Difficulties in handling two normed structures at a time *)
 
 Program Definition pseudometricmixin_of_normaxioms (V : lmodType R) (norm : V -> R)
   (ax1 : forall x y : V, norm (x + y) <= norm x + norm y)
@@ -467,7 +459,7 @@ by rewrite (H (-1) (e - x)) normrN1 mul1r.
 Qed.
 Next Obligation.
 move => V norm H _ _ ; rewrite /ball_ => x y z e1 e2 normxy normyz.
-by rewrite (subr_trans y) (le_lt_trans (H  _ _)) ?ltr_add.
+by  rewrite -(subrKA y) (le_lt_trans (H  _ _)) ?ltr_add. 
 Qed.
 Next Obligation. by []. Qed.
 
@@ -517,7 +509,7 @@ Admitted.
 
 
 Lemma Rdiff_withini (f : C^o -> C^o) c:
-  ('D_('i) (f : (Rcomplex R) -> (Rcomplex R))  c =
+  ('D_('i) (f )  c =
       lim ((fun h : C^o => h^-1 *: ((f \o shift c) (h * 'i) - f c)) @ locR0 )).
 Proof. Admitted.
 
@@ -526,58 +518,51 @@ Lemma Rdiff_lim (f : C^o -> C^o) c v:
   (derivable (f : (Rcomplex R) -> (Rcomplex R)) c v).
 Proof.
 Admitted.
-  
-Check derivable_locallyxP.   Check eqaddoP.
-Check nearE. 
-
-Lemma my_derivable_locallyxP (K: numFieldType) (V W: normedModType K) (f: V ->  W) (c v: V) :
-  derivable f c v <-> ((forall eps , 0 < eps -> \forall h \near (locally (0: K^o)), `|f (c + h *: v) - (f c) - 'D_c f (h *:v)| <= eps * `|h|)).
-Admitted.
-  
-Check derivable_locallyxP. 
 
 Lemma continuous_near (T U: topologicalType) (f: T -> U) (P : set U) (a : T):
  (f @ a --> f a) -> ((\forall x \near locally (f a), P x)
                            -> (\forall y \near locally a, P (f y))).
 Proof.  by move/(_ P) => /=; near_simpl. Qed.
 
-Lemma holomorphic_locallyxP  (f: C^o -> C^o) (c: C^o): (forall (eps: C), 0 < eps
-  -> (\forall h \near (locally (0:C^o)),`|(f (c + h) - f c - 'D_c f h)| <= eps * `|h|))
-  -> holomorphic f c.
-Proof. (* use continuous_near ? *)
-  move => H ;apply/holomorphicP => /= v; rewrite my_derivable_locallyxP /= => eps eps0.
-    case (EM (`|v| == 0)).
-    - rewrite normr_eq0 ; move => /eqP ->. admit.
-    - rewrite normr_eq0 ; move => /negP ; rewrite -normr_gt0 => lev0.
-      have leepsv0: 0 < eps / `|v|  by apply divr_gt0.
-      rewrite nearE.  move: {H}  (H (eps /`|v|) leepsv0) => [r r0 H].
-      exists (r / `|v|); first by apply divr_gt0 .
-      move => /= h; rewrite sub0r normrN ltr_pdivl_mulr; last by [].
-      move: (H (h *: v)).  simpl. rewrite sub0r.  rewrite normrN /= (normmZ h v) mulrC -mulrA.
-      have -> : `|v|^-1 * (`|v| * `|h|) = `|h|. rewrite mulrA mulVf. by rewrite mul1r.  admit.
-      by [].
-Admitted.
+
+Lemma holomorphicP (f : C^o -> C^o)  c : holomorphic f c <-> derivable f c 1.
+  Admitted.
+
 
 Lemma Diff_CR_holo (f : C^o -> C^o) c:
   (forall v : C^o, Rderivable_fromcomplex f c v) /\ (CauchyRiemanEq f c)
   -> (holomorphic f c).
   Proof.
-Check Rdiff_lim.
-move=> [der CR].
-apply: holomorphic_locallyxP => eps eps0.
-near=> h. 
-move/Rdiff_lim : (der h) ; rewrite derivable_locallyxP; move/(_ 1).
-rewrite !scale1r.
-case h=> x y.   
-have lemx :  'D_(x +i* y) (f : (Rcomplex R) -> (Rcomplex R))  c =
-           x *: 'D_1 (f : (Rcomplex R) -> (Rcomplex R))  c
-           + y *: 'D_('i) (f : (Rcomplex R) -> (Rcomplex R))  c.
-admit.
-have lemi : 'i * 'D_1 (f : (Rcomplex R) -> (Rcomplex R))  c =
-         'D_('i) (f : (Rcomplex R) -> (Rcomplex R))  c.
-by rewrite Rdiff_withinR Rdiff_withini.
-have lem: (x *: 'D_1 f c + y *: ('i * 'D_1 f c)) = (x +i* y) * 'D_1 f c. admit.
-
+move=> [der CR]; apply/holomorphicP /derivable_locallyP /eqaddoP => eps eps0.  
+rewrite nearE /=.
+move/Rdiff_lim: (der (1 : C^o)); move/derivable_locallyP/eqaddoP/(_ (normc eps)); elim.
+move => r1 r10 h1.
+move/Rdiff_lim: (der ('i : C^o)); move/derivable_locallyP/eqaddoP/(_ (normc eps)); elim.
+move => ri ri0 hi. 
+case: (EM (r1  < ri)) => r1i. (*TODO, R totally ordered *)
+- exists ri%:C.
+  + admit.
+  + move => [x y] /=; rewrite sub0r normrN => hri.
+    set fh := (X in `|X| <= _).
+    have  -> : fh =  (f ( (x +i* y) + c) - ( (f c) +  (x +i* y) *: ('D_1 f c)))by  admit.
+    have x1 : `|x| < r1 by admit.
+    have yi : `|y| < ri by admit.
+    move: (hi y) ; simpl; rewrite sub0r normrN; move /(_ yi) {hi}.
+    set fi := (X in `|X| <= _).
+    have  -> : fi =  (f ( y *: ('i : Rcomplex R) + c) - ( (f c) +  y *: ('D_'i f c))) by admit. 
+    move => hi {fi}.
+    move: (h1 x) ; simpl; rewrite sub0r normrN; move /(_ x1) {h1}.
+    set f1 := (X in `|X| <= _).
+    have  -> : f1 =  (f ( x *: (1 : Rcomplex R) + c) - ( (f c) +  x *: ('D_1 f c))) by admit.
+    move => h1 {f1}.
+    have -> : (x +i* y) *: 'D_1 f c = x *: 'D_1 f c  + y *: 'D_('i) f c. 
+      have <- : 'i * 'D_1 (f : (Rcomplex R) -> (Rcomplex R)) c =
+               'D_('i) (f) c  by rewrite Rdiff_withinR  Rdiff_withini.
+      admit.
+    admit.  (* need continuity of f*)
+- exists r1%:C.
+  + admit.
+  + admit.
 Admitted.
 
 
