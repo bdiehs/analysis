@@ -267,25 +267,9 @@ Section vecspace_of_numfield. (*NEW*)
   (*While there may not be a canonical algebra on each ring,
     we assume here there is a canonical vecspace on each field *)
 Variable (K : numFieldType).
-Definition numfield_lmodMixin :=
-  let mkMixin := @GRing.Lmodule.Mixin K  _ (@GRing.mul K) in
-  mkMixin (@GRing.mulrA K) (@GRing.mul1r K) (@GRing.mulrDr K)
-          (fun v a b => GRing.mulrDl a b v).
-Canonical numfield_lmodType := LmodType K K numfield_lmodMixin.
-
-Canonical numfield_lalgType := LalgType K K (@GRing.mulrA _).
-
-Lemma numfield_scale_mul  :
-  forall x y : K, x * y = x *: y. (*TODO: naming *)
-Proof. by []. Qed.
-
-Lemma scalerCA_numField (x y z : K) :
-  x *: (y * z) = y * (x *: z).
-Proof.
- by rewrite -!numfield_scale_mul mulrA mulrA [in _ * y]mulrC.
-Qed.
-
-Canonical numfield_algType :=  AlgType K K (scalerCA_numField).
+Canonical numfield_lmodType := [lmodType K of K for [lmodType K of K^o]].
+Canonical numfield_lalgType := [lalgType K of K for [lalgType K of K^o]].
+Canonical numfield_algType := [algType K of K for [algType K of K^o]].
 
 End vecspace_of_numfield.
 
