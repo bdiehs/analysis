@@ -2,7 +2,7 @@
 Require Reals.
 From mathcomp Require Import ssreflect ssrfun ssrbool ssrnat eqtype choice.
 From mathcomp Require Import seq fintype bigop order ssralg ssrint ssrnum finmap.
-From mathcomp Require Import matrix interval zmodp.
+From mathcomp Require Import matrix interval zmodp vector fieldext falgebra.
 Require Import boolp ereal reals Rstruct.
 Require Import classical_sets posnum topology prodnormedzmodule.
 
@@ -260,50 +260,251 @@ Definition pseudoMetric_of_normedDomain
   := PseudoMetricMixin ball_norm_center ball_norm_symmetric ball_norm_triangle erefl.
 End pseudoMetric_of_normedDomain.
 
-Canonical pseudoMetric_of_normedDomain. (* new. ok ? *) 
-
 Section vecspace_of_numfield. (*NEW*)
-  (*Redundant with ^o *)
-  (*While there may not be a canonical algebra on each ring,
-    we assume here there is a canonical vecspace on each field *)
-Variable (K : numFieldType).
-Canonical numfield_lmodType := [lmodType K of K for [lmodType K of K^o]].
-Canonical numfield_lalgType := [lalgType K of K for [lalgType K of K^o]].
-Canonical numfield_algType := [algType K of K for [algType K of K^o]].
+  (*TODO: put all results on ^o in a separate module (C. Cohen suggestion) *)
+  (* !! Redundant with ^o *)
+  (* While there may not be a canonical algebra on each ring, we assume here  *)
+  (* there is a canonical vecspace on each field. We make use of the          *)
+  (* canonical algebraic structures defined on regular algebras in mathcomp   *)
+  
+Canonical numField_lmodType (K : numFieldType) :=
+  [lmodType K of K for [lmodType K of K^o]].
+Canonical numField_lalgType (K : numFieldType) :=
+  [lalgType K of K for [lalgType K of K^o]].
+Canonical numField_algType (K : numFieldType) :=
+  [algType K of K for [algType K of K^o]].
+Canonical numField_comAlgType (K : numFieldType) :=   [comAlgType K of K].
+Canonical numField_unitAlgType (K : numFieldType) := [unitAlgType K of K].
+Canonical numField_comUnitAlgType (K : numFieldType) := [comUnitAlgType K of K].
+Canonical numField_vectType (K : numFieldType) :=
+  [vectType K of K for [vectType K of K^o]].
+Canonical numField_falgType (K : numFieldType) := [FalgType K of K].
+Canonical numField_fieldExtType (K : numFieldType) :=
+  [fieldExtType K of K for regular_fieldExtType K].
+
+Canonical numClosedField_lmodType (K : numClosedFieldType) :=
+  [lmodType K of K for [lmodType K of K^o]].
+Canonical numClosedField_lalgType (K : numClosedFieldType) :=
+  [lalgType K of K for [lalgType K of K^o]].
+Canonical numClosedField_algType (K : numClosedFieldType) :=
+  [algType K of K for [algType K of K^o]].
+Canonical numClosedField_comAlgType (K : numClosedFieldType) :=
+  [comAlgType K of K].
+Canonical numClosedField_unitAlgType (K : numClosedFieldType) :=
+  [unitAlgType K of K].
+Canonical numClosedField_comUnitAlgType (K : numClosedFieldType) :=
+  [comUnitAlgType K of K].
+Canonical numClosedField_vectType (K : numClosedFieldType) :=
+  [vectType K of K for [vectType K of K^o]].
+Canonical numClosedField_falgType (K : numClosedFieldType) := [FalgType K of K].
+Canonical numClosedField_fieldExtType (K : numClosedFieldType) :=
+  [fieldExtType K of K for regular_fieldExtType K].
+
+Canonical realField_lmodType (K : realFieldType) :=
+  [lmodType K of K for [lmodType K of K^o]].
+Canonical realField_lalgType (K : realFieldType) :=
+  [lalgType K of K for [lalgType K of K^o]].
+Canonical realField_algType (K : realFieldType) :=
+  [algType K of K for [algType K of K^o]].
+Canonical realField_comAlgType (K : realFieldType) := [comAlgType K of K].
+Canonical realField_unitAlgType (K : realFieldType) := [unitAlgType K of K].
+Canonical realField_comUnitAlgType (K : realFieldType) :=
+  [comUnitAlgType K of K].
+Canonical realField_vectType (K : realFieldType) :=
+  [vectType K of K for [vectType K of K^o]].
+Canonical realField_falgType (K : realFieldType) := [FalgType K of K].
+Canonical realField_fieldExtType (K : realFieldType) :=
+  [fieldExtType K of K for regular_fieldExtType K].
+
+Canonical archiField_lmodType (K : archiFieldType) :=
+  [lmodType K of K for [lmodType K of K^o]].
+Canonical archiField_lalgType (K : archiFieldType) :=
+  [lalgType K of K for [lalgType K of K^o]].
+Canonical archiField_algType (K : archiFieldType) :=
+  [algType K of K for [algType K of K^o]].
+Canonical archiField_comAlgType (K : archiFieldType) := [comAlgType K of K].
+Canonical archiField_unitAlgType (K : archiFieldType) := [unitAlgType K of K].
+Canonical archiField_comUnitAlgType (K : archiFieldType) :=
+  [comUnitAlgType K of K].
+Canonical archiField_vectType (K : archiFieldType) :=
+  [vectType K of K for [vectType K of K^o]].
+Canonical archiField_falgType (K : archiFieldType) := [FalgType K of K].
+Canonical archiField_fieldExtType (K : archiFieldType) :=
+  [fieldExtType K of K for regular_fieldExtType K].
+
+Canonical rcf_lmodType (K : rcfType) :=
+  [lmodType K of K for [lmodType K of K^o]].
+Canonical rcf_lalgType (K : rcfType) :=
+  [lalgType K of K for [lalgType K of K^o]].
+Canonical rcf_algType (K : rcfType) := [algType K of K for [algType K of K^o]].
+Canonical rcf_comAlgType (K : rcfType) := [comAlgType K of K].
+Canonical rcf_unitAlgType (K : rcfType) := [unitAlgType K of K] .
+Canonical rcf_comUnitAlgType (K : rcfType) := [comUnitAlgType K of K].
+Canonical rcf_vectType (K : rcfType) :=
+  [vectType K of K for [vectType K of K^o]].
+Canonical rcf_falgType (K : rcfType) := [FalgType K of K].
+Canonical rcf_fieldExtType (K : rcfType) :=
+  [fieldExtType K of K for regular_fieldExtType K].
+
+Canonical real_lmodType (K : realType) :=
+  [lmodType K of K for [lmodType K of K^o]].
+Canonical real_lalgType (K : realType) :=
+  [lalgType K of K for [lalgType K of K^o]].
+Canonical real_algType (K : realType) :=
+  [algType K of K for [algType K of K^o]].
+Canonical real_comAlgType (K : realType) := [comAlgType K of K].
+Canonical real_unitAlgType (K : realType) := [unitAlgType K of K].
+Canonical real_comUnitAlgType (K : realType) := [comUnitAlgType K of K].
+Canonical real_vectType (K : realType) :=
+  [vectType K of K for [vectType K of K^o]].
+Canonical real_falgType (K : realType) := [FalgType K of K].
+Canonical real_fieldExtType (K : realType) :=
+  [fieldExtType K of K for regular_fieldExtType K].
+
+
+Coercion numField_lmodType : numFieldType >-> lmodType.
+Coercion numField_lalgType : numFieldType >-> lalgType.
+Coercion numField_comAlgType : numFieldType >-> comAlgType. (* ambiguous path *)
+Coercion numField_unitAlgType : numFieldType >-> unitAlgType.
+Coercion numField_comUnitAlgType : numFieldType >-> comUnitAlgType. (* ambiguous path *)
+Coercion numField_vectType  : numFieldType >-> vectType.
+Coercion numField_falgType : numFieldType >-> FalgType.
+Coercion numField_fieldExtType : numFieldType >-> fieldExtType. (* ambiguous path *)
+
+
+
+(* TODO : other coercions *)
 
 End vecspace_of_numfield.
 
 
-Section numField_canonical. (*New *)
-Variable R : numFieldType.
-(*Canonical topological_of_numFieldType := [numFieldType of R^o].*)
-Canonical numFieldType_pointedType :=
+
+Section numField_topological. (*New *)
+
+Canonical numFieldType_pointedType (R: numFieldType) :=
   [pointedType of R for pointed_of_zmodule R].
-Canonical numFieldType_filteredType :=
+Canonical numFieldType_filteredType (R: numFieldType) :=
   [filteredType R of R for filtered_of_normedZmod R].
-Canonical numFieldType_topologicalType : topologicalType := TopologicalType R
-  (topologyOfBallMixin (pseudoMetric_of_normedDomain [normedZmodType R of R])).
-Canonical numFieldType_pseudoMetricType := @PseudoMetric.Pack R R
-  (@PseudoMetric.Class R R (Topological.class numFieldType_topologicalType)
+Canonical numFieldType_topologicalType (R: numFieldType) : topologicalType :=
+  TopologicalType R
+   (topologyOfBallMixin (pseudoMetric_of_normedDomain [normedZmodType R of R])).
+Canonical numFieldType_pseudoMetricType (R: numFieldType)
+  := @PseudoMetric.Pack R R
+  (@PseudoMetric.Class R R (Topological.class (numFieldType_topologicalType R))
   (@pseudoMetric_of_normedDomain R R)).
-End numField_canonical.
 
-Section realField_canonical. (*New *)
-Variable R : realFieldType. Check [numFieldType of R].
-Canonical realFieldType_pointedType :=
+Canonical numClosedFieldType_pointedType (R: numClosedFieldType) :=
   [pointedType of R for [pointedType of [numFieldType of R]]].
-Canonical realFieldType_filteredType :=
-  [filteredType _ of R for [filteredType R of [numFieldType of _]]].
+Canonical numClosedFieldType_filteredType (R: numClosedFieldType) :=
+  [filteredType _ of R for [filteredType _ of [numFieldType of R]]].
+Canonical numClosedFieldType_topologicalType (R: numClosedFieldType) : topologicalType :=
+  (* [topologicalType of R for [topologicalType of [numFieldType of R]]]. *)
+  (*leads to ambiguous path *)
+  TopologicalType R
+ (topologyOfBallMixin (pseudoMetric_of_normedDomain [normedZmodType R of R])).
+Canonical numClosedFieldType_pseudoMetricType (R: numClosedFieldType) :=
+ (* [pseudoMetricType _ of R for [pseudoMetricType _ of [numFieldType of R]]]. *)
+ (* leads to ambiguous path *) 
+  @PseudoMetric.Pack R R
+  (@PseudoMetric.Class R R (Topological.class (numClosedFieldType_topologicalType R))
+(@pseudoMetric_of_normedDomain R R)).
 
-Canonical realFieldType_topologicalType : topologicalType :=
-  [topologicalType of R for  [topologicalType of [numFieldType of R]]].
-Canonical realFieldType_pseudoMetricType :=
-  [pseudoMetricType _ of R for
-      [pseudoMetricType  _ of [numFieldType of R]]].
+Canonical realFieldType_pointedType (R: realFieldType) :=
+  [pointedType of R for [pointedType of [numFieldType of R]]].
+Canonical realFieldType_filteredType (R: realFieldType) :=
+ [filteredType _ of R for [filteredType _ of [numFieldType of R]]].
+Canonical realFieldType_topologicalType (R: realFieldType) : topologicalType :=
+  (* [topologicalType of R for [topologicalType of [numFieldType of R]]]. *)
+  (*leads to ambiguous path *)
+  TopologicalType R
+ (topologyOfBallMixin (pseudoMetric_of_normedDomain [normedZmodType R of R])).
+Canonical realFieldType_pseudoMetricType (R: realFieldType) :=
+ (* [pseudoMetricType _ of R for [pseudoMetricType _ of [numFieldType of R]]]. *)
+ (* leads to ambiguous path *) 
+  @PseudoMetric.Pack R R
+  (@PseudoMetric.Class R R (Topological.class (realFieldType_topologicalType R))
+(@pseudoMetric_of_normedDomain R R)).
 
-Canonical realField_lmodType := [lmodType R of R for [lmodType _ of [numFieldType of R]]]. 
+Canonical archiFieldType_pointedType (R: archiFieldType) :=
+  [pointedType of R for [pointedType of [numFieldType of R]]].
+Canonical archiFieldType_filteredType (R: archiFieldType) :=
+  [filteredType _ of R for [filteredType _ of [numFieldType of R]]].
+Canonical archiFieldType_topologicalType (R: archiFieldType) : topologicalType :=
+ (* [topologicalType of R for [topologicalType of [numFieldType of R]]]. *)
+  (*leads to ambiguous path *)
+  TopologicalType R
+ (topologyOfBallMixin (pseudoMetric_of_normedDomain [normedZmodType R of R])).
+Canonical archiFieldType_pseudoMetricType (R: archiFieldType):=
+   (* [pseudoMetricType _ of R for [pseudoMetricType _ of [numFieldType of R]]]. *)
+ (* leads to ambiguous path *) 
+  @PseudoMetric.Pack R R
+  (@PseudoMetric.Class R R (Topological.class (archiFieldType_topologicalType R))
+(@pseudoMetric_of_normedDomain R R)).
 
-End realField_canonical.
+Canonical rcfType_pointedType (R: rcfType) :=
+  [pointedType of R for [pointedType of [numFieldType of R]]].
+Canonical rcfType_filteredType (R: rcfType) :=
+  [filteredType R of R for filtered_of_normedZmod R].
+Canonical rcfType_topologicalType (R: rcfType) : topologicalType :=
+ (* [topologicalType of R for [topologicalType of [numFieldType of R]]]. *)
+  (*leads to ambiguous path *)
+  TopologicalType R
+ (topologyOfBallMixin (pseudoMetric_of_normedDomain [normedZmodType R of R])).
+Canonical rcfType_pseudoMetricType (R: rcfType) :=
+  (* [pseudoMetricType _ of R for [pseudoMetricType _ of [numFieldType of R]]]. *)
+ (* leads to ambiguous path *) 
+  @PseudoMetric.Pack R R
+  (@PseudoMetric.Class R R (Topological.class (rcfType_topologicalType R))
+(@pseudoMetric_of_normedDomain R R)).
+
+Canonical realType_pointedType (R: realType) :=
+  [pointedType of R for [pointedType of [numFieldType of R]]].
+Canonical realType_filteredType (R: realType) :=
+  [filteredType _ of R for [filteredType _ of [numFieldType of R]]].
+Canonical realType_topologicalType (R: realType) : topologicalType :=
+ (* [topologicalType of R for [topologicalType of [numFieldType of R]]]. *)
+  (*leads to ambiguous path *)
+  TopologicalType R
+ (topologyOfBallMixin (pseudoMetric_of_normedDomain [normedZmodType R of R])).
+Canonical realType_pseudoMetricType (R: realType) :=
+  (* [pseudoMetricType _ of R for [pseudoMetricType _ of [numFieldType of R]]]. *)
+ (* leads to ambiguous path *) 
+  @PseudoMetric.Pack R R
+  (@PseudoMetric.Class R R (Topological.class (realType_topologicalType R))
+(@pseudoMetric_of_normedDomain R R)).
+
+Coercion numFieldType_pointedType : numFieldType >-> pointedType.
+Coercion numFieldType_filteredType : numFieldType >-> filteredType. 
+Coercion numFieldType_topologicalType : numFieldType >-> topologicalType.
+Coercion numFieldType_pseudoMetricType : numFieldType >-> pseudoMetricType.
+
+Coercion numClosedFieldType_pointedType : numClosedFieldType >-> pointedType.
+Coercion numClosedFieldType_filteredType : numClosedFieldType >-> filteredType.
+Coercion numClosedFieldType_topologicalType : numClosedFieldType >-> topologicalType.
+Coercion numClosedFieldType_pseudoMetricType : numClosedFieldType >-> pseudoMetricType.
+
+Coercion realFieldType_pointedType : realFieldType >-> pointedType.
+Coercion realFieldType_filteredType : realFieldType >-> filteredType.
+Coercion realFieldType_topologicalType : realFieldType >-> topologicalType.
+Coercion realFieldType_pseudoMetricType : realFieldType >-> pseudoMetricType.
+
+Coercion archiFieldType_pointedType : archiFieldType >-> pointedType.
+Coercion archiFieldType_filteredType : archiFieldType >-> filteredType.
+Coercion archiFieldType_topologicalType : archiFieldType >-> topologicalType.
+Coercion archiFieldType_pseudoMetricType : archiFieldType >-> pseudoMetricType.
+
+Coercion rcfType_pointedType : rcfType >-> pointedType.
+Coercion rcfType_filteredType : rcfType >-> filteredType.
+Coercion rcfType_topologicalType : rcfType >-> topologicalType.
+Coercion rcfType_pseudoMetricType : rcfType >-> pseudoMetricType.
+
+Coercion realType_pointedType : realType >-> pointedType.
+Coercion realType_filteredType : realType >-> filteredType.
+Coercion realType_topologicalType : realType >-> topologicalType.
+Coercion realType_pseudoMetricType : realType >-> pseudoMetricType.
+
+
+End numField_topological.
 
 
 Canonical R_pointedType := [pointedType of
@@ -316,8 +517,9 @@ Canonical R_topologicalType : topologicalType := TopologicalType Rdefinitions.R
 Canonical R_pseudoMetricType : pseudoMetricType R_numDomainType :=
   PseudoMetricType Rdefinitions.R (pseudoMetric_of_normedDomain R_normedZmodType).
 
-(*Do we need the following ? Not sure*)
+
 Section numFieldType_regular_canonical. (*Modified *)
+  (* TODO: specific module *)
 Variable R : numFieldType.
 (*Canonical topological_of_numFieldType := [numFieldType of R^o].*)
 Canonical numFieldType_vec_pointedType :=
@@ -331,7 +533,6 @@ Canonical numFieldType_vec_pseudoMetricType := @PseudoMetric.Pack R R^o
                 (Topological.class numFieldType_vec_topologicalType)
                 (@pseudoMetric_of_normedDomain R R)).
 End numFieldType_regular_canonical.
-
 
 
 
@@ -487,19 +688,40 @@ Proof. by case: V => ? [? ? ? ? ? []]. Qed.
 
 End pseudoMetricnormedzmodule_lemmas.
 
-Section numFieldType_canonical_contd.
-Variable R : numFieldType.
-Lemma R_ball : @ball _ [pseudoMetricType R of R] = ball_ (fun x => `| x |).
-Proof. by []. Qed.
-Definition numFieldType_pseudoMetricNormedZmodMixin :=
-  PseudoMetricNormedZmodule.Mixin R_ball.
-Canonical numFieldType_pseudoMetricNormedZmodType :=
-  @PseudoMetricNormedZmodType R R numFieldType_pseudoMetricNormedZmodMixin.
-End numFieldType_canonical_contd.
+Section numFieldType_pseudoMetricNormedZmod. (*modified*)
 
-Canonical realFieldType_PseudoMetricNormedZmodule (R: realFieldType) := (*New*)
-  [pseudoMetricNormedZmodType _ of R for
-      [pseudoMetricNormedZmodType  _ of [numFieldType of R]]].
+Lemma R_ball (R : numFieldType) :
+    @ball _ [pseudoMetricType R of R] = ball_ (fun x => `| x |).
+Proof. by []. Qed.
+Definition numFieldType_pseudoMetricNormedZmodMixin (R : numFieldType):=
+  PseudoMetricNormedZmodule.Mixin (R_ball R).
+Canonical numFieldType_pseudoMetricNormedZmodType (R : numFieldType) :=
+  @PseudoMetricNormedZmodType R R (numFieldType_pseudoMetricNormedZmodMixin R).
+
+(*NEW*)
+Canonical numClosedFieldType_PseudoMetricNormedZmodule (R: numClosedFieldType) := 
+   [pseudoMetricNormedZmodType _ of R for
+   [pseudoMetricNormedZmodType  _ of [numFieldType of R]]].
+
+Canonical archiFieldType_PseudoMetricNormedZmodule (R: archiFieldType) := 
+   [pseudoMetricNormedZmodType _ of R for
+   [pseudoMetricNormedZmodType  _ of [numFieldType of R]]].
+
+Canonical realFieldType_PseudoMetricNormedZmodule (R: realFieldType) :=
+   [pseudoMetricNormedZmodType _ of R for
+   [pseudoMetricNormedZmodType  _ of [numFieldType of R]]].
+
+Canonical rcfType_PseudoMetricNormedZmodule (R: rcfType) :=
+   [pseudoMetricNormedZmodType _ of R for
+   [pseudoMetricNormedZmodType  _ of [numFieldType of R]]].
+
+Canonical realType_PseudoMetricNormedZmodule (R: realType) :=
+   [pseudoMetricNormedZmodType _ of R for
+   [pseudoMetricNormedZmodType  _ of [numFieldType of R]]].
+(*end NEW*)
+
+End numFieldType_pseudoMetricNormedZmod.
+
 (** locally *)
 
 Section Locally.
@@ -2797,7 +3019,7 @@ Canonical AbsRing_NormedModType (K : absRingType) :=
 
 
 
-Section NormedMod_of_numfield. (* NEW  !*) (*TODO: correct *)
+Section normedMod_of_numfield. (* NEW  !*) (*TODO: correct *)
 
 Lemma numField_normZ (R : numFieldType) (l : R) (x : R) :
   `| l *: x | = `| l | * `| x |.
@@ -2809,26 +3031,29 @@ Proof. by rewrite normrM. Qed.
 
 Variable (R : numFieldType).
 
-Definition regular_numFieldType_NormedModMixin  :=
-  NormedModMixin (@numDomain_normZ R).
-Canonical regular_numFieldType_normedModType :=
-  NormedModType R R^o (regular_numFieldType_NormedModMixin).
-
 Definition numField_normedModMixin := NormedModMixin (@numField_normZ R).
 
 Definition numField_normedModType :=
-  NormedModType R (numfield_lmodType R) numField_normedModMixin.
+  NormedModType R (numField_lmodType R) numField_normedModMixin.
 
-End NormedMod_of_numfield.
+End normedMod_of_numfield.
 
 (* TODO : if numField_normedModType is canonical the lmodType structure on any
  (V :  normedModType R ) fails *)
 
-(* Canonical numField_normedModType. *)
-(* Variables (R : numFieldType)  (V : normedModType R) (x : R) (w : V). *)
+(* Canonical numField_normedModType.  *)
+(* Variables (R : numFieldType)  (V : normedModType R) (x : R) (w : V).  *)
 (* Fail Check (x *: w). *)
 
+(* FAIL *)
 
+Section regular_normedMod.
+  (* TODO: specific module *)
+Definition regular_numFieldType_NormedModMixin (R : numFieldType) :=
+  NormedModMixin (@numDomain_normZ R).
+Canonical regular_numFieldType_normedModType (R : numFieldType) :=
+  NormedModType R R^o (regular_numFieldType_NormedModMixin R). 
+End regular_normedMod.
 
 (** Normed vector spaces have some continuous functions *)
 
