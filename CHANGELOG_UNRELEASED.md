@@ -9,6 +9,7 @@
 - in `classical_sets.v`:
   + lemmas `setIIl`, `setIIr`, `setCS`, `setSD`, `setDS`, `setDSS`, `setCI`,
     `setDUr`, `setDUl`, `setIDA`, `setDD`
+  + lemmas `set0M`, `setM0`, `image_set0_set0`, `subset_set1`, `preimage_set0`
 
 ### Changed
 
