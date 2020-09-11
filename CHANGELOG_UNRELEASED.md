@@ -25,6 +25,13 @@
 
 ### Removed
 
+- in `boolp.v`:
+  + `eqNN`
+- in `normedtype.v`:
+  + `forallN`
+  + `eqNNP`
+  + `existsN`
+
 ### Infrastructure
 
 ### Misc

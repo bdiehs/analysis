@@ -574,9 +574,6 @@ Proof. by rewrite propeqE; split=> [[]|[]]; [right|left|right|left]. Qed.
 Lemma andC (P Q : Prop) : (P /\ Q) = (Q /\ P).
 Proof. by rewrite propeqE; split=> [[]|[]]. Qed.
 
-Lemma eqNN (P : Prop) : (~ ~ P) = P.
-Proof. by rewrite propeqE; split=> [/contrapT|?]. Qed.
-
 Lemma forallNE {T} (P : T -> Prop) : (forall x, ~ P x) = ~ exists x, P x.
 Proof.
 by rewrite propeqE; split => [fP [x /fP]//|nexP x Px]; apply: nexP; exists x.
@@ -594,7 +591,7 @@ Proof. by rewrite existsNE. Qed.
 
 Lemma not_existsP T (P : T -> Prop) :
   (exists x : T, P x) <-> ~ forall x : T, ~ P x.
-Proof. by rewrite forallNE eqNN. Qed.
+Proof. by rewrite forallNE notK. Qed.
 
 Lemma forallNP T (P : T -> Prop) :
   (forall x : T, ~ P x) <-> ~ exists x : T, P x.
@@ -602,7 +599,7 @@ Proof. by rewrite forallNE. Qed.
 
 Lemma not_forallP T (P : T -> Prop) :
   (forall x : T, P x) <-> ~ exists x : T, ~ P x.
-Proof. by rewrite existsNE eqNN. Qed.
+Proof. by rewrite existsNE notK. Qed.
 
 (* -------------------------------------------------------------------- *)
 Definition xchooseb {T : choiceType} (P : pred T) (h : `[exists x, P x]) :=
